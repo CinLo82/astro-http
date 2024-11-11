@@ -1,36 +1,51 @@
 import type { APIRoute } from "astro";
+import { db, Clients } from 'astro:db';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request}) => {
 
-    return new Response(JSON.stringify(
-        {
-            method: "GET",
+    const body = {
+        "method": "GET",
+    }
 
-        }), {
-    
+    const users = await db.select().from(Clients).all();
+
+    return new Response(JSON.stringify(users), {
         status: 200,
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
     })
 }
 
 export const POST: APIRoute = async ({ params, request}) => {
 
-    const body = await request.json()
+    try {
+        const { id, ...body } = await request.json();
 
-    return new Response(JSON.stringify(
-        {
-            method: "POST",
-            ...body
+        const resp = await db.insert(Clients).values(body)
+        console.log(resp)
+
+        const { lastInsertRowid} = await db.insert(Clients).values(body);
+
+        return new Response(JSON.stringify({
+            id: +lastInsertRowid!.toString(),
+            ...body,
         }), {
-    
-        status: 200,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        return new Response(JSON.stringify({ msg: "Error" }), {
+            status: 400,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
 }
+
 
