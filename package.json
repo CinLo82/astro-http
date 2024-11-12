@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:remote": "astro dev --remote",
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
@@ -16,6 +17,7 @@
     "@astrojs/mdx": "^3.1.8",
     "@astrojs/rss": "^4.0.9",
     "@astrojs/sitemap": "^3.2.1",
+    "@libsql/client": "^0.14.0",
     "astro": "^4.16.7",
     "typescript": "^5.6.3"
   }
