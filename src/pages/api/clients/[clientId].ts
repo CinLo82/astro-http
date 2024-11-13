@@ -6,21 +6,40 @@ export const prerender = false;
 // obtener la persona por el id
 export const GET: APIRoute = async ({ params, request }) => {
 
-    const clientId = params.clientId
+    const clientId = params.clientId ?? '';
 
-    const body = {
-        Method: "GET",
-        "client_id": clientId
-    }
+    try {
+        const clients = await db
+            .select()
+            .from(Clients)
+            .where(eq(Clients.id, +clientId))
 
-    return new Response(JSON.stringify(body), {
-        headers: {
-            "Content-Type": "application/json"
+            if (clients.length === 0) {
+                return new Response(
+                    JSON.stringify({ MSG: 'No se encontró el cliente' }), 
+                    { 
+                        status: 404,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                }
+
+        return new Response(JSON.stringify(clients.at(0)), {
+            headers: {
+                'Content-Type': 'application/json'
             }
-        }
-    );
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return new Response(JSON.stringify({ msg: "Error fetching client" }), {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
 };
-
 
 export const PATCH: APIRoute = async ({ params, request}) => {
     const clientId = params.clientId ?? '';
